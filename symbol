@@ -1,0 +1,47 @@
+# by using this, we can detect mathematical symbols
+
+import cv2
+import imutils
+
+ 
+img = cv2.imread("image_shapes.png", cv2.IMREAD_GRAYSCALE)
+
+resized = imutils.resize(img, width=500)
+
+
+_, threshold = cv2.threshold(resized, 220, 255, cv2.THRESH_BINARY)
+_, contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+ 
+
+font = cv2.FONT_HERSHEY_COMPLEX
+ 
+for cnt in contours:
+    approx = cv2.approxPolyDP(cnt, 0.01*cv2.arcLength(cnt, True), True)
+    
+    cv2.drawContours(resized, [cnt], 0, (0), 1)
+    x = approx.ravel()[0]
+    y = approx.ravel()[1]
+    print(len(approx))
+  
+    if len(approx) == 12:
+        print("plus")
+        cv2.putText(resized, "plus",(x,y) , font, 1, (0))
+    elif len(approx) == 4:
+        print("Minus")
+        cv2.putText(resized, "Minus", (x, y), font, 1, (0))
+    elif len(approx) == 18:
+        print("Multiply")
+        cv2.putText(resized, "Multiply", (x, y), font, 1, (0))
+    elif len(approx) == 6:
+        print("Division")
+        cv2.putText(resized, "Division", (x, y), font, 1, (0))
+    elif len(approx) == 7:
+        print("square root")
+        cv2.putText(resized, "square root", (x, y), font, 1, (0))
+ 
+cv2.imshow("shapes", img)
+cv2.imshow("resized", resized)
+cv2.imshow("Threshold", threshold)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
